@@ -1,37 +1,43 @@
-import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+  import { Http, Headers, RequestOptions } from '@angular/http';
+  import { Component } from '@angular/core';
+  import { NavController, NavParams, ToastController } from 'ionic-angular';
 
-@Component({
-  selector: 'page-list',
-  templateUrl: 'list.html'
-})
-export class ListPage {
-  selectedItem: any;
-  icons: string[];
-  items: Array<{title: string, note: string, icon: string}>;
+  @Component({
+    selector: 'page-list',
+    templateUrl: 'list.html'
+  })
+  export class ListPage {
+    selectedItem: any;
+    icons: string[];
+    private url:string = 'http://localhost:3030/v1';
+    private message: any = {};
+    public car = {
+      name: "", 
+      price: "", 
+      type: "",
+      mark: ""
+    };
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
-    // If we navigated to this page, we will have an item available as a nav param
-    this.selectedItem = navParams.get('item');
+    constructor(public navCtrl: NavController, 
+                public toastCtrl: ToastController,
+                public navParams: NavParams,
+                public http: Http) {
+      
+    }
 
-    // Let's populate this page with some filler content for funzies
-    this.icons = ['flask', 'wifi', 'beer', 'football', 'basketball', 'paper-plane',
-    'american-football', 'boat', 'bluetooth', 'build'];
+    saveCar(car) {
+      let headers = new Headers();
+          headers.append('Content-type', 'application/json');
 
-    this.items = [];
-    for (let i = 1; i < 11; i++) {
-      this.items.push({
-        title: 'Item ' + i,
-        note: 'This is item #' + i,
-        icon: this.icons[Math.floor(Math.random() * this.icons.length)]
-      });
+      let options = new RequestOptions({headers: headers});
+      this.http.post(this.url + '/cars', car, options)
+        .map(res => { res.json() })
+        .subscribe(data => {
+          let toast = this.toastCtrl.create({
+            duration: 3000,
+            message: data.msg
+        });
+        toast.present();
+        });
     }
   }
-
-  itemTapped(event, item) {
-    // That's right, we're pushing to ourselves!
-    this.navCtrl.push(ListPage, {
-      item: item
-    });
-  }
-}
