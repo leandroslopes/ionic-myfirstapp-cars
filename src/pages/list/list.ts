@@ -31,7 +31,7 @@
 
       let options = new RequestOptions({headers: headers});
       this.http.post(this.url + '/cars', car, options)
-        .map(res => { res.json() })
+        .map(res => res.json())
         .subscribe(data => {
           let toast = this.toastCtrl.create({
             duration: 3000,
